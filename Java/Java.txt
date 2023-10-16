@@ -1,0 +1,174 @@
+#Identifiers
+	Name used to identify a class or vairable or label or method or package... 
+	Example:
+		public com.dataplayground.employee;
+		public static void main(String[] args){
+			int a;
+			public void check(){}
+		}
+
+		Identifiers: package employee, class main, predefined classname String, varialble a, method check
+        
+        alpha numeric characters, $ and  _
+		should not start with number 
+		We can use predefined class as identifier : String String - correct
+		cannot use "reserved words" : some words are reserved to represent some functionalities defined by that particular language
+
+
+#Reserved words: can be keywords or literals 
+
+#keywords: for defining some functionalities: around 50 in JAVA
+
+     		data types: int float double long boolean byte char short | var
+     		modifiers: public private protected (specifies range of component in which we can access )
+     				   static final abstract synchronized transient volatile strictfp
+     		flow control: if else do while for switch case default break continue return
+     		Exception handling: try catch assert throw throws finally
+     		class-related: class package extends implements import export module requires
+     		object-related: new instanceof super this
+     		Other: void enum     |  unused keywords: goto- used in CCP to transfer the control from one line to another
+     					const- used to define a const in CCP ?
+
+
+var : is a keyword which is added in Java 10, allows us to declare a variable without defining their type
+
+#Literals:
+	constant values which can be assigned to the variable.
+	null, true, false, "employee" 
+
+
+
+#Primitive Data Types:
+		1. byte
+				8-bit signed Two-s complement integer
+				size: 8-bit 
+				value: -128 to 127
+				defaultval: 0 
+
+		2. short 
+				16-bit signed Two-s complement integer
+				size: 16-bit
+				value: -32768 to 32768
+				defaultval: 0 
+
+		3. int
+				32-bit signed Two-s complement integer (used for numeric values)
+				size: 16-bit
+				value: -2^31 to 2^31 -1
+				defaultval: 0 
+
+		4. long 
+				64-bit singned Two-s complement integer
+				size: 64-bit
+				value: -2^63 to 2^63 -1
+				defaultval: 0l
+
+		unsigned int (0 to 2^31 -1) : Integer class
+ 		unsigned long (0 to 2^63 -1) : Long class
+
+
+		5. float
+				32-bit floating point. Use f or F suffix to deine float data type
+				float f = 34.5f
+				defaultval: 0.0f
+
+		6. double
+				64-bit floating point. 
+				double d = 23.42442
+				defaultval: 0.0d 
+
+		7. boolean
+				represents one bit of inforomation
+				true or false
+				defaultval: false
+
+		8. char
+				single 16-bit Unicode character
+				char c= 'J'
+				defaultval: /u0000
+
+
+		double vs float: 
+			float takes 4 bytes of memory where as double takes 8 bytes in memory
+			So float is single precision floating point where as double is double precision decimal number
+
+
+
+
+#Type Conversion:
+		2 type casting in java:
+			-> Implicit : 
+					Primitive to Primitive
+					Automatic type conversion happens only when both type are compatible
+					and target type if larger than source type.
+					int a = 50; long b=a;
+
+					byte -> short , char -> int -> long -> float -> double
+
+					Example:
+					int a = 10;
+					byte b = 2;
+					char c = 'A';
+					double d = 2.4;
+					System.out.println(a+b+c+d); 
+
+					ans: 79.4
+
+			-> Explicit
+
+
+#final : make variable constant so it cannot get changed through out the program
+
+#Wrapper Class for Primitive type:
+		we can access primitives as objects using wrapper class
+		boolean - java.lang.Boolean
+		byte - java.lang.Byte
+		char - java.lang.Character
+		double - java.lang.Double
+		float - java.lang.Float
+		int - java.lang.Integer
+        	long - java.lang.Long
+        	short - java.lang.Short
+        	void - java.lang.Void
+
+
+We can consider a Class as Data type but interfaces can not be seen as data types because they
+    do not hold anything.
+
+
+
+#main method:
+		entry point of execution of any java program.
+		used by JVM to start executing the program
+
+		Main method has an argument, 'args array' of type string. (can rename it)
+		When we run the program from command prompt we can pass some input to our java program
+
+		if main() method is declared non-static then JVM would not be able to call it without
+		creating the instance of that Class.
+
+	    	JVM cannot create instance of the main Class as there is no standard constructor defined in
+	   	 main class.
+
+	    	Main method is public so that it is visible to every class. If its not public,
+	   	 then JVM classes might not be able to access it.
+
+	    	we can declare main method as final.
+    		 This makes its implementation final; any other Class would not be able to change it.
+
+    		Before JDK7 we had static initialisers as an alternative approach for main method but
+	   	 from JDK 7 we cannot do so.
+
+	          //static initialiser:
+	          public class Demo{
+	          	static{
+	          		sysout();
+	          		System.exit(0);
+	          	}
+	          }
+
+
+
+
+
+

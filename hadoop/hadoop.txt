@@ -1,0 +1,105 @@
+Hadoop -> HDFS + MapReduce
+
+File System :  NTFS(Windows), EXT (Linux), HDFS, S3(AWS objects)
+-> used to read and write from and to HardDrive
+    |
+    v
+ ---FS----   OS
+    HD
+
+BLOCK: fs split data into small chunks
+
+NTFS: 16kb, ext : 512kb
+
+Types of file System: Standalone, distributes
+
+    1 <---> 2  <--> 3
+
+    DE: Data should be distributed within clusters
+    N/W: topology of infrastructure
+
+Types of distributed:
+1. Master - slave :  hadoop, spark
+   Disadvantages
+   SPOS: Single point of Source, any node down only master knows
+   due to SPOC: Single Point of Communication
+2. peer to peer : each node is connected to/know the status of other node
+   EX: Cassandra
+
+Program in execution is process
+Background process for each process -  daemon process
+example: hadoop is a process for which there are 5 deamon processes (3 hdfs, 2 mp)
+
+node - individual machine
+cluster - group of nodes
+
+block size in hdfs: 1B = 64MB (hadoop 1), 1B = 128MP (later versions)
+
+Replication: no of copies for block
+say storing 1gb data, say divided into 4 blocks and replication factor =3
+                n1    n2   n3
+                b1    b2   b3
+                b4    b1   b2
+                b2    b3   b4
+                b3    b4   b1
+
+
+
+Edge node: developers don't directly connect to master or cluster node for read write ( to trigger any hadoop jobs, mapreduce jobs, spark jobs...)
+
+> READ-WRITE algo :
+
+Suppose you are make write request to one node,
+then one client-ap is created which redirects the request to Master node
+Only info about data, is send to master (not the actual data)
+Master daemon will create meta-data:
+1. file size (say 1gb) , block size (default 64mb) = number of blocks = 1000/64
+2. Replication for each block
+3. placement for each block (Rack awareness policy algorithm)
+
+This meta-data is stored in ext of master machine.
+
+> Client-api will create a pipeline, it will distribute the data:
+
+For example:
+    B0B1B2.....B12B13B14B15
+    B0B0BO.....B14B15B15B15 (after replication, Rf = 3)
+    1 2 3          2  3 4   (placement)
+                  n1 (master node)
+
+       n2     n3      n4      n5
+   -->B0..
+             B0..B15
+                      B0..B15
+                               ..B15
+
+After this each node sends a confirmation/acknowledgement that block is written successfully:
+then pipeline will confirm client api :
+then master knows successfull write happended
+
+For every 3 sec slave will communicate to master (heartbeat communication)
+Master this way will know which node is alive
+
+Failure: Network | software ,  hardware issue
+
+1. say node4 is dead, automatic failover : again hadoop will try to get 3 as replication factor
+2. say 2 nodes go down, hadoop will try to do automatic failover
+ but since only 2 nodes are available it will have the data in those 2, can't maintain rf =3
+3. suggestion: make a failure as permanent one by removing the node and adding new one
+Case:
+   nodes   n1      n2      n3      n4
+                   Fail
+           B0      B0B15   B0B15    B15
+
+Say n2 fails so and B0 gets replicated to n4 : meta data got updated,
+but in the meantime n2 is alive again then B15 wont be replicated. Now as per
+meta data B0 is available in n1,n3,n4 so we only will have to clear BO present
+in n2. Hence better to make it a permanent failure and remove n2 itself.
+
+
+HA: High Availability
+> if master node gets down, everything is gone as meta data will be gone (if permanent failure)
+
+Masternode sends
+
+

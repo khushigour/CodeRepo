@@ -1,0 +1,64 @@
+
+MPP- massive parallel processing technology/framework
+
+Advantage of MR:
+> Cluster monitoring
+> resource allocation (RAM needed ?)
+> cluster management (what if node goes down)
+> Scheduling
+> Execution
+> Speculative execution (L)
+
+Aim of MR: to achieve data locality
+To identify which machine/datanode has the particular required
+block and in that task should be executed
+
+Daemons in MR: Jobtracker and Tasktracker - v1
+Resource manager and node manager - v2
+
+
+MAP (parallelism )-> REDUCE (combine back)
+EXAMPLE:
+           Single process = 1 Teacher (/core)
+           Task: find topper for state
+           Paper checking speed for 1 teacher = 1min/paper
+           Total time = 20 min
+
+           IIel processing = 4 teacher
+           Task: find topper for state
+
+           5 mins taken as divided in 4 teacher to get topper from 4 teachers (say at district level)
+           now reducer: one final topper found from these 4 toppers (at state level)
+
+           MAP:  T1   T2   T3   T4 - > 5 MINS
+
+           REDUCE: FINAL_TOPPER   -> 4 MINS
+           Total time = 9 mins
+
+
+Different Java code for mapper side and reducer side
+
+MAPPER:
+Input  = Blocks
+Stored = HDFS, can read from local, rdms, or other file system (batch not streaming ones like kafka)
+
+REDUCER:
+Input = map output
+Store = HDFS, NOSQL, RDMS...
+
+MAP - MAP - REDUCE : possible
+MAP - REDUCE - REDCUE :  not possible ( possible in spark)
+
+No of Blocks  = No of mapper (by default)
+No of reducer = decided by developer
+
+> ARCHITECTURE 1
+- convert Java into jar file then execute ( container mapper and reducer class)
+- deamon JT ---request---> namenode ---response---> (metadata)
+- assign task to TaskTracker
+- launch map JVM (parallely)
+- INTERMIDIATE DATA - output of mapper stored in : local file system of node | spark has option to store in memory
+- TaskTracker also sends heartbeat to JobTracker
+- Reducer Task starts, Reduce jvm: JT informs Mapper nodes to transfer output to reducer node via HTTP protool
+- This gets stored in local file system then HDFS
+- In between execution in one datanode, the node went down then whole job wont be killed only this task will be restarted

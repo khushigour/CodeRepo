@@ -86,20 +86,81 @@ Failure: Network | software ,  hardware issue
 2. say 2 nodes go down, hadoop will try to do automatic failover
  but since only 2 nodes are available it will have the data in those 2, can't maintain rf =3
 3. suggestion: make a failure as permanent one by removing the node and adding new one
-Case:
+
+4. Case:
    nodes   n1      n2      n3      n4
                    Fail
            B0      B0B15   B0B15    B15
 
-Say n2 fails so and B0 gets replicated to n4 : meta data got updated,
+ Say n2 fails so and B0 gets replicated to n4 : meta data got updated,
 but in the meantime n2 is alive again then B15 wont be replicated. Now as per
 meta data B0 is available in n1,n3,n4 so we only will have to clear BO present
 in n2. Hence better to make it a permanent failure and remove n2 itself.
 
+5. Case: Failure during write,
+
+6. Your read and write request wont fail in any case though apart from these 2:
+ > all nodes are down
+ > client api itself is down/failed
+
+JP1 - namenode, JP2 - datanode, JP3 - secondary namenode
+JP4 - job tracker(1) / resource manager (2), JP5 - task tracker (1)/ node manager (2)
 
 HA: High Availability
 > if master node gets down, everything is gone as meta data will be gone (if permanent failure)
 
-Masternode sends
+Hence extra hard-drive copies are made at some interval of masternode, but this issue is resolved in later versions
+
+READ: request goes to client api, which sends to master and then meta data is recieved and then
+client api directly contact the desired node to get data
 
 
+Hadoop2 version - more than one namenode / one Active(ANN) possible , others Passive(PNN)
+  n1 n2 n3 - namenodes
+  slave: n4 n5 n6 - datanodes ( heartbeat send to all namenodes)
+Zookeeper : cluster coordinator technology, monitors all namenode /  elects namenode
+(LEADER & FOLLOWER sturcture) zookeeper itself is a cluster with 1 leader and some followers
+If leader goes down, other follower is elected as leader and namenodes are monitored by the new elected one now.
+
+TYPES OF NODES:
+   Hadoop1
+ > masternode - NN + JT
+ > slave node - DN + TT
+ > checkpointnode - SNN
+
+ Hadoop2 (without HA)
+ > masternode - NN +RM
+ > slavenode - DN + NM
+ > SNN
+
+ Hadoop2 (with HA)
+ ANN+ARM PNN+PRM
+ ZK ZK ZK - zookeeper nodes
+ JN JN JN - to store meta data in sharding
+ DN+NM DN+NM DN+NM
+
+
+ Types of CLUSTER:
+ 1. Single Node (Psuedo Node Cluster)
+  All in one: nn + rm + dn + Nm + snn
+ 2. Distributed
+        | nm + rm |
+        | snn |
+        | dn + Nm |
+
+
+> Hadoop framework :    Loosely coupled framework
+
+Abstraction of Mapreduce: these 4
+                 query engine                               data pipeline rdms only     (scheduler)
+            hive(sql -> java mpr) , pig (piglatin) , sqoop (commands, data import-export), oozy (xml)
+             -------------------------------------------------------------------------------
+  |  HBASE  |                               MR
+  Hbase shell
+   commands    
+             -------------------------------------------------------------------------------
+     NOSQL            HDFS - shell commands to distribute data
+
+
+Flume - connect with rdms also, also messaging queue (only retrieve data to hadoop not reverse)
+Mahaut - ML related stuFF

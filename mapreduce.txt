@@ -60,5 +60,44 @@ No of reducer = decided by developer
 - INTERMIDIATE DATA - output of mapper stored in : local file system of node | spark has option to store in memory
 - TaskTracker also sends heartbeat to JobTracker
 - Reducer Task starts, Reduce jvm: JT informs Mapper nodes to transfer output to reducer node via HTTP protool
-- This gets stored in local file system then HDFS
-- In between execution in one datanode, the node went down then whole job wont be killed only this task will be restarted
+- This gets stored in local file system, then HDFS
+- In between execution in one datanode, the node went down then whole job wont be killed only this task will be restarted (get 2nd copy info from metadata and start task in that node)
+CASE: say 2 diff blocks of same file present in same node, then how processing happens ?
+- Whenever request comes from job tracker it spans to 2 mapper jvm and 2 reducer jvm (Execution happems parallely within the node also)
+- If other blocks present then others will be in queue or we can increase threads | we cannot achieve 100% parallelism cause we don't know whic block present in which node. 
+s
+
+MAPPER & REDUCER INPUT/OUTPUT FORMAT:
+
+-> Always key-value pair
+->1) Text input & Text Output: key = offset(starting position of the record) of record, value = whole line of the record
+->2) Key value input & output format : upto 1st delimiter (tab)
+
+
+HOW DATA FLOWS:
+CASE: 
+    - 1, amazon, mobile, 2000
+B0  | 2, amazon, TV, 1000
+    - 3, flipkart, AC, 3000
+    - 4, flipkart, washington, 5000
+B1  | 5, amazon, cycle, 5500
+    | 6, ebay, watvh, 7800
+    - 7, flipkart, laptop, 9800
+
+Select the column (in mapper side)
+shuffle - sort group by
+interating and sum (not over records, but over list within record)
+
+DATATYPES:
+
+
+ARCHITECTURE 2:
+
+       MR SPARK HBASE STORM
+    ----------------------------
+                YARN - cluster manager gives common execution model for any stack run on top of it
+    -----------------------------
+                HDFS
+
+
+

@@ -1,1 +1,24 @@
-hive
+
+CREATE (DATABASE|SCHEMA) [IF NOT EXISTS] database_name [COMMENT 'database_comment'] [LOCATION 'hdfs_path'] [WITH DBPROPERTIES (property_name=property_value, ...)]; 
+
+SHOW (DATABASES|SCHEMAS) [LIKE 'pattern']; 
+
+USE database_name; 
+
+ALTER (DATABASE|SCHEMA) database_name [SET DBPROPERTIES (property_name=property_value, ...)] [SET OWNER [USER|ROLE] user_or_role] [SET LOCATION 'new_hdfs_path']; 
+
+DROP (DATABASE|SCHEMA) [IF EXISTS] database_name [RESTRICT|CASCADE]; 
+
+CREATE TABLE <table_name> ( 
+    column1 data_type, 
+    column2 data_type, 
+    ... 
+) 
+STORED AS <file_format>; 
+
+CREATE TABLE <table_name> ( 
+    column1 data_type, 
+    column2 data_type, 
+    ... 
+) PARTITIONED BY (partition_column data_type) 
+STORED AS <file_format>; 

@@ -1,13 +1,23 @@
 
-CREATE (DATABASE|SCHEMA) [IF NOT EXISTS] database_name [COMMENT 'database_comment'] [LOCATION 'hdfs_path'] [WITH DBPROPERTIES (property_name=property_value, ...)]; 
+CREATE (DATABASE|SCHEMA) [IF NOT EXISTS] database_name [COMMENT 'database_comment'] [LOCATION 'hdfs_path'] [WITH DBPROPERTIES (property_name=property_value, ...)];
+
+------------------------------------------------------------------------------------------------ 
 
 SHOW (DATABASES|SCHEMAS) [LIKE 'pattern']; 
 
+------------------------------------------------------------------------------------------------
+
 USE database_name; 
+
+------------------------------------------------------------------------------------------------
 
 ALTER (DATABASE|SCHEMA) database_name [SET DBPROPERTIES (property_name=property_value, ...)] [SET OWNER [USER|ROLE] user_or_role] [SET LOCATION 'new_hdfs_path']; 
 
+------------------------------------------------------------------------------------------------
+
 DROP (DATABASE|SCHEMA) [IF EXISTS] database_name [RESTRICT|CASCADE]; 
+
+------------------------------------------------------------------------------------------------
 
 CREATE TABLE <table_name> ( 
     column1 data_type, 
@@ -16,9 +26,93 @@ CREATE TABLE <table_name> (
 ) 
 STORED AS <file_format>; 
 
+------------------------------------------------------------------------------------------------
+
 CREATE TABLE <table_name> ( 
     column1 data_type, 
     column2 data_type, 
     ... 
 ) PARTITIONED BY (partition_column data_type) 
 STORED AS <file_format>; 
+
+------------------------------------------------------------------------------------------------
+
+Hive supports two types of partitioning: static and dynamic.
+> In static partitioning, partition values are explicitly specified during data loading. It is suitable for scenarios where partition values are known beforehand and the data is already pre-processed.
+
+CREATE TABLE sales_partitioned (order_id INT, product_name STRING) 
+PARTITIONED BY (sale_date STRING); 
+
+> Dynamic partitioning automatically derives partition values from the input data during data loading. It is useful for scenarios where partition values are not known beforehand or the data is not pre-processed.
+
+#FOR DYNAMIC
+SET hive.exec.dynamic.partition = true; 
+SET hive.exec.dynamic.partition.mode = nonstrict; 
+
+INSERT INTO TABLE <table_name> PARTITION (partition_column) 
+SELECT column1, column2, ..., partition_column FROM <source_table>; 
+
+INSERT OVERWRITE TABLE sales_partitioned PARTITION (sale_date) 
+SELECT order_id, product_name, sale_date 
+FROM sales; 
+
+---------------------------------------------------------------------------------------------------
+
+1. Multi-column partitioning
+
+CREATE TABLE <table_name> ( 
+    column1 data_type, 
+    column2 data_type, 
+    ... 
+) PARTITIONED BY (partition_column1 data_type, partition_column2 data_type) 
+STORED AS <file_format>; 
+
+2. Multi-
+
+
+----------------------------------------------------------------------------------------------------
+
+> DATATYPES: 
+
+1. Primitive: 
+
+CREATE TABLE persons (id INT, name STRING, age INT); 
+
+CREATE TABLE persons (id INT, name STRING, address VARCHAR(100)); 
+
+CREATE TABLE events (id INT, event_name STRING, event_time TIMESTAMP); 
+
+2. Complex: 
+
+Array - CREATE TABLE persons (id INT, name STRING, favorite_numbers ARRAY<INT>);   (Collection Type)
+Map - CREATE TABLE persons (id INT, name STRING, extra_info MAP<STRING, STRING>);  (Collection Type)
+Struct - CREATE TABLE persons (id INT, name STRING, address STRUCT<street: STRING, city: STRING, state: STRING, zip: INT>); 
+
+3. User-Defined Types:
+UDTs can be created using the CREATE TYPE statement and are implemented as Java classes.
+
+CREATE TYPE address AS STRUCT<street: STRING, city: STRING, state: STRING, zip: INT>;
+CREATE TABLE persons (id INT, name STRING, address address); 
+
+---------------------------------------------------------------------------------------------------
+
+INSERTION OF DATA:
+
+INSERT INTO table_name [PARTITION (partition_column=value, ...)] 
+VALUES (value1, value2, ...); 
+
+INSERT INTO table_name [PARTITION (partition_column=value, ...)] 
+SELECT column1, column2, ... 
+FROM source_table 
+WHERE condition; 
+
+>> Perform bulk data insertion into a table. This command is particularly useful when you have large datasets stored in external files, such as CSV or TSV files.
+
+LOAD DATA [LOCAL] INPATH 'input_path' [OVERWRITE] INTO TABLE table_name [PARTITION (partition_column=value, ...)]; 
+
+---------------------------------------------------------------------------------------------------
+
+INSERT OVERWRITE TABLE sales_partitioned PARTITION (sale_date='2023-01-01') 
+SELECT order_id, product_name 
+FROM sales 
+WHERE sale_date='2023-01-01'; 

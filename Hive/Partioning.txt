@@ -1,0 +1,52 @@
+CREATE TABLE <table_name> ( 
+    column1 data_type, 
+    column2 data_type, 
+    ... 
+) PARTITIONED BY (partition_column data_type) 
+STORED AS <file_format>; 
+
+------------------------------------------------------------------------------------------------
+
+Hive supports two types of partitioning: static and dynamic.
+> In static partitioning, partition values are explicitly specified during data loading. It is suitable for scenarios where partition values are known beforehand and the data is already pre-processed.
+
+CREATE TABLE sales_partitioned (order_id INT, product_name STRING) 
+PARTITIONED BY (sale_date STRING); 
+
+> Dynamic partitioning automatically derives partition values from the input data during data loading. It is useful for scenarios where partition values are not known beforehand or the data is not pre-processed.
+
+#FOR DYNAMIC
+SET hive.exec.dynamic.partition = true; 
+SET hive.exec.dynamic.partition.mode = nonstrict; 
+
+INSERT INTO TABLE <table_name> PARTITION (partition_column) 
+SELECT column1, column2, ..., partition_column FROM <source_table>; 
+
+INSERT OVERWRITE TABLE sales_partitioned PARTITION (sale_date) 
+SELECT order_id, product_name, sale_date 
+FROM sales; 
+
+---------------------------------------------------------------------------------------------------
+
+1. Multi-column partitioning
+
+CREATE TABLE <table_name> ( 
+    column1 data_type, 
+    column2 data_type, 
+    ... 
+) PARTITIONED BY (partition_column1 data_type, partition_column2 data_type) 
+STORED AS <file_format>; 
+
+2. Multi-Level Partitioning:
+
+
+Advanced Optimizations: 
+
+1. Compact Partitioning:
+In cases where a large number of small partitions are created, it may be beneficial to compact partitions by merging small partitions into larger ones to optimize query performance.
+
+2. File Format Selection:
+Selecting the right file format for partitioned tables, such as Parquet or ORC, can result in better compression, columnar storage, and faster query execution.
+
+3. Partition Bucketing:
+Combine partitioning with bucketing to further optimize query performance by clustering data based on specific columns within each partition.

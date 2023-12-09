@@ -28,49 +28,7 @@ STORED AS <file_format>;
 
 ------------------------------------------------------------------------------------------------
 
-CREATE TABLE <table_name> ( 
-    column1 data_type, 
-    column2 data_type, 
-    ... 
-) PARTITIONED BY (partition_column data_type) 
-STORED AS <file_format>; 
 
-------------------------------------------------------------------------------------------------
-
-Hive supports two types of partitioning: static and dynamic.
-> In static partitioning, partition values are explicitly specified during data loading. It is suitable for scenarios where partition values are known beforehand and the data is already pre-processed.
-
-CREATE TABLE sales_partitioned (order_id INT, product_name STRING) 
-PARTITIONED BY (sale_date STRING); 
-
-> Dynamic partitioning automatically derives partition values from the input data during data loading. It is useful for scenarios where partition values are not known beforehand or the data is not pre-processed.
-
-#FOR DYNAMIC
-SET hive.exec.dynamic.partition = true; 
-SET hive.exec.dynamic.partition.mode = nonstrict; 
-
-INSERT INTO TABLE <table_name> PARTITION (partition_column) 
-SELECT column1, column2, ..., partition_column FROM <source_table>; 
-
-INSERT OVERWRITE TABLE sales_partitioned PARTITION (sale_date) 
-SELECT order_id, product_name, sale_date 
-FROM sales; 
-
----------------------------------------------------------------------------------------------------
-
-1. Multi-column partitioning
-
-CREATE TABLE <table_name> ( 
-    column1 data_type, 
-    column2 data_type, 
-    ... 
-) PARTITIONED BY (partition_column1 data_type, partition_column2 data_type) 
-STORED AS <file_format>; 
-
-2. Multi-
-
-
-----------------------------------------------------------------------------------------------------
 
 > DATATYPES: 
 
@@ -116,3 +74,17 @@ INSERT OVERWRITE TABLE sales_partitioned PARTITION (sale_date='2023-01-01')
 SELECT order_id, product_name 
 FROM sales 
 WHERE sale_date='2023-01-01'; 
+
+----------------------------------------------------------------------------------------------------
+
+SELECT product_id, sale_date, SUM(sale_amount) 
+FROM sales 
+GROUP BY GROUPING SETS ((product_id), (sale_date)); 
+
+SELECT product_id, sale_date, SUM(sale_amount) 
+FROM sales 
+GROUP BY CUBE (product_id, sale_date); 
+
+SELECT product_id, sale_date, SUM(sale_amount) 
+FROM sales 
+GROUP BY ROLLUP (product_id, sale_date); 

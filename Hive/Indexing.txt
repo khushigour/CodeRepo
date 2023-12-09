@@ -1,0 +1,26 @@
+It's worth noting that indexing in Hive does not always provide the same level of performance improvement as it does in other database systems to the distributed nature of Hadoop.
+It's also important to remember that indexes come with a cost - they consume additional storage and need to be maintained, which can add complexity and overhead.
+
+
+Types of Indexing in Hive: 
+
+
+Compact Indexes: These indexes store a mapping between the index key and the HDFS block that contains the row. Compact indexes are relatively small but may still take a long time to scan for large datasets.
+
+Bitmap Indexes: Bitmap indexes use a bitmap for each key and can quickly answer queries that test if a key is in a set. These indexes are efficient in terms of storage but are best used on low-cardinality columns, where the total number of distinct values is relatively small.
+
+B-Tree Indexes: B-Tree indexes are a balance between compact and bitmap indexes. They can handle high-cardinality data, and they're faster than compact indexes for large datasets.
+
+
+CREATE INDEX commands:
+
+CREATE INDEX product_id_index 
+ON TABLE sales (product_id) 
+AS 'compact' 
+WITH DEFERRED REBUILD 
+IDXPROPERTIES ('creator'='admin'); 
+
+
+ALTER INDEX product_id_index ON sales REBUILD; 
+
+

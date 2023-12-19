@@ -88,3 +88,6 @@ GROUP BY CUBE (product_id, sale_date);
 SELECT product_id, sale_date, SUM(sale_amount) 
 FROM sales 
 GROUP BY ROLLUP (product_id, sale_date); 
+
+----------------------------------------------------------------------------------------------------
+
